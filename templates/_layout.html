@@ -10,9 +10,9 @@
 
     <title>{{title}} &middot; WordPress Deploy</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/font-awesome.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
 </head>
 <body>
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -22,8 +22,8 @@
             </div>
             <div class="collapse navbar-collapse pull-right">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('sites') }}">Sites</a></li>
-                    <li><a href="{{ url_for('users') }}">Users</a></li>
+                    <li><a href="{{url_for('sites')}}">Sites</a></li>
+                    <li><a href="{{url_for('users')}}">Users</a></li>
                 </ul>
             </div>
         </div>
@@ -32,6 +32,6 @@
         {% block body %}{% endblock %}
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
 </body>
 </html>

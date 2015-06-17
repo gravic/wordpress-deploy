@@ -36,14 +36,14 @@ class Site(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     slug = db.Column(db.String(255), unique=True)
     name = db.Column(db.String(255), unique=True)
-    testing = db.Column(db.String(255), unique=False)
-    production = db.Column(db.String(255), unique=False)
+    testing_url = db.Column(db.String(255), unique=False)
+    production_url = db.Column(db.String(255), unique=False)
 
-    def __init__(self, name, testing, production):
+    def __init__(self, name, testing_url, production_url):
         self.slug = generate_slug(name)
         self.name = name
-        self.testing = testing
-        self.production = production
+        self.testing_url = testing_url
+        self.production_url = production_url
 
     def __repr__(self):
         return '<Site %r>' % self.slug
@@ -57,11 +57,13 @@ def generate_slug(string):
 
 @app.route('/')
 def index():
-    return render_template('index.html', title='Home')
+    sites = Site.query.all()
+
+    return render_template('index.html', title='Home', sites=sites)
 
 @app.errorhandler(404)
 def error_404(error):
-    return render_template('errors/404.html'), 404
+    return render_template('errors/404.html', title='404'), 404
 
 @app.route('/login')
 def login():
@@ -88,13 +90,13 @@ def users_add():
 
         return redirect(url_for('users'))
 
-    return render_template('users/add.html')
+    return render_template('users/add.html', title='Add User')
 
 @app.route('/users/<string:username>/edit', methods=['GET', 'POST'])
 def users_edit(username):
     user = User.query.filter_by(username=username).first()
 
-    return render_template('users/edit.html', title='', user=user)
+    return render_template('users/edit.html', title='Edit User', user=user)
 
 @app.route('/sites')
 def sites():
@@ -107,8 +109,8 @@ def sites_add():
     if request.method == 'POST':
         site = Site(
             request.form['name'],
-            request.form['testing'],
-            request.form['production']
+            request.form['testing_url'],
+            request.form['production_url']
         )
 
         db.session.add(site)
@@ -116,7 +118,7 @@ def sites_add():
 
         return redirect(url_for('sites'))
 
-    return render_template('sites/add.html')
+    return render_template('sites/add.html', title='Add Site')
 
 @app.route('/sites/<string:slug>/edit', methods=['GET', 'POST'])
 def sites_edit(slug):
@@ -124,14 +126,14 @@ def sites_edit(slug):
 
     if request.method == 'POST':
         site.name = request.form['name']
-        site.testing = request.form['testing']
-        site.production = request.form['production']
+        site.testing_url = request.form['testing_url']
+        site.production_url = request.form['production_url']
 
         db.session.commit()
 
         return redirect(url_for('sites'))
 
-    return render_template('sites/edit.html', title='', site=site)
+    return render_template('sites/edit.html', title='Edit Site', site=site)
 
 if __name__ == '__main__':
     app.run()

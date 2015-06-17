@@ -1,4 +1,7 @@
 {% extends '_layout.html' %}
 {% block body %}
-    <h1>Hello</h1>
+
+    {% for site in sites %}
+        {{site.name}}
+    {% endfor %}
 {% endblock %}

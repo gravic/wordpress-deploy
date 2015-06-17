@@ -1,23 +1,32 @@
 {% extends '_layout.html' %}
 {% block body %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th><i class="fa fa-pencil fa-fw"></i></th>
-                <th>Name</th>
-                <th>Testing URL</th>
-                <th>Production URL</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for site in sites %}
-            <tr>
-                <td><a href="{{ url_for('sites_edit', slug=site.slug) }}"><i class="fa fa-pencil fa-fw"></i></a></td>
-                <td>{{site.name}}</td>
-                <td>{{site.testing}}</td>
-                <td>{{site.production}}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-lg-12">
+            <a class="btn btn-default" href="{{url_for('sites_add')}}"><i class="fa fa-plus fa-fw"></i>&nbsp;Add Site</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><i class="fa fa-pencil fa-fw"></i></th>
+                        <th>Name</th>
+                        <th>Testing URL</th>
+                        <th>Production URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for site in sites %}
+                    <tr>
+                        <td><a href="{{ url_for('sites_edit', slug=site.slug) }}"><i class="fa fa-pencil fa-fw"></i></a></td>
+                        <td>{{site.name}}</td>
+                        <td><a href="{{site.testing_url}}" target="_blank">{{site.testing_url}}</a></td>
+                        <td><a href="{{site.production_url}}" target="_blank">{{site.production_url}}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
