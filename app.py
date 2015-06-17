@@ -200,7 +200,7 @@ def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
     result = tasks.bar.delay(site.testing_url, site.production_url)
-    result.wait()
+    result.ready()
 
     return redirect(url_for('index'))
 
