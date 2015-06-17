@@ -199,8 +199,7 @@ def sites_edit(slug):
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
-    result = tasks.bar.delay(site.testing_url, site.production_url)
-    result.ready()
+    result = tasks.compile_site.delay(site.slug, site.testing_url, site.production_url)
 
     return redirect(url_for('index'))
 
