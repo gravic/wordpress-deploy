@@ -18,6 +18,7 @@ app.config.update(dict(
     SECRET_KEY=SETTINGS.SECRET_KEY,
     CELERY_BROKER_URL=SETTINGS.CELERY_BROKER_URL,
     CELERY_RESULT_BACKEND=SETTINGS.CELERY_RESULT_BACKEND,
+    # CELERY_TASK_SERIALIZER='json',
     DEBUG=True
 ))
 
@@ -88,12 +89,23 @@ def authorize(f):
 
     return decorated
 
+active_tasks = dict()
+
 @app.route('/')
 @authorize
 def index():
     sites = Site.query.all()
 
-    return render_template('index.html', title='Home', sites=sites)
+    completed = []
+
+    for site, task in active_tasks.iteritems():
+        if task.ready():
+            completed.append(site)
+
+    for task in completed:
+        active_tasks.pop(task)
+
+    return render_template('index.html', title='Home', sites=sites, tasks=active_tasks)
 
 @app.errorhandler(404)
 def error_404(error):
@@ -200,6 +212,8 @@ def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
     result = tasks.compile_site.delay(site.slug, site.testing_url, site.production_url)
+
+    active_tasks[slug] = result
 
     return redirect(url_for('index'))
 
