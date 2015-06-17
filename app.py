@@ -1,7 +1,8 @@
 import re
 import sqlite3
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, Response, request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
+from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -11,6 +12,7 @@ app.config.update(dict(
     SQLALCHEMY_DATABASE_URI='sqlite:///db/deploy.db',
     USERNAME='',
     PASSWORD='',
+    SECRET_KEY='SECRET_KEY',
     DEBUG=True
 ))
 
@@ -55,7 +57,18 @@ def generate_slug(string):
 
     return string.lower()
 
+def authorize(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('username'):
+            return redirect(url_for('login'))
+
+        return f(*args, **kwargs)
+
+    return decorated
+
 @app.route('/')
+@authorize
 def index():
     sites = Site.query.all()
 
@@ -65,17 +78,38 @@ def index():
 def error_404(error):
     return render_template('errors/404.html', title='404'), 404
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if check_password_hash(user.password, password):
+            session['username'] = user.username
+
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('login'))
+
     return render_template('login.html', title='Login')
 
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+
+    return redirect(url_for('login'))
+
 @app.route('/users')
+@authorize
 def users():
     users = User.query.all()
 
     return render_template('users/users.html', title='Users', users=users)
 
 @app.route('/users/add', methods=['GET', 'POST'])
+@authorize
 def users_add():
     if request.method == 'POST':
         user = User(
@@ -93,18 +127,21 @@ def users_add():
     return render_template('users/add.html', title='Add User')
 
 @app.route('/users/<string:username>/edit', methods=['GET', 'POST'])
+@authorize
 def users_edit(username):
     user = User.query.filter_by(username=username).first()
 
     return render_template('users/edit.html', title='Edit User', user=user)
 
 @app.route('/sites')
+@authorize
 def sites():
     sites = Site.query.all()
 
     return render_template('sites/sites.html', title='Sites', sites=sites)
 
 @app.route('/sites/add', methods=['GET', 'POST'])
+@authorize
 def sites_add():
     if request.method == 'POST':
         site = Site(
@@ -121,6 +158,7 @@ def sites_add():
     return render_template('sites/add.html', title='Add Site')
 
 @app.route('/sites/<string:slug>/edit', methods=['GET', 'POST'])
+@authorize
 def sites_edit(slug):
     site = Site.query.filter_by(slug=slug).first()
 
