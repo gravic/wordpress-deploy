@@ -4,6 +4,7 @@ from flask import Flask, redirect, render_template, Response, request, session, 
 from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from celery import Celery
 from compiler import Compiler
 import settings as SETTINGS
 
@@ -15,10 +16,26 @@ app.config.update(dict(
     USERNAME=SETTINGS.DB_USERNAME,
     PASSWORD=SETTINGS.DB_PASSWORD,
     SECRET_KEY=SETTINGS.SECRET_KEY,
+    CELERY_BROKER_URL=SETTINGS.CELERY_BROKER_URL,
+    CELERY_RESULT_BACKEND=SETTINGS.CELERY_RESULT_BACKEND,
     DEBUG=True
 ))
 
 db = SQLAlchemy(app)
+
+def make_celery(app):
+    celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
+
+celery = make_celery(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -180,11 +197,17 @@ def sites_edit(slug):
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
-    compiler = Compiler('', site.testing_url, site.production_url)
-
-    compiler.compile()
+    result = compile.delay(site)
+    result.wait()
 
     return redirect(url_for('index'))
+
+@celery.task
+def compile(site):
+    print 'Celery!'
+    # compiler = Compiler('', site.testing_url, site.production_url)
+
+    # compiler.compile()
 
 if __name__ == '__main__':
     app.run()
