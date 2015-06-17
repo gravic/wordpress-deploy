@@ -8,7 +8,7 @@ from datetime import datetime
 
 class Compiler(object):
     def __init__(self, output_dir, testing_url, production_url):
-        self.output_dir = './test/'
+        self.output_dir = os.path.abspath(output_dir)
         self.testing_url = testing_url
         self.production_url = production_url
 
