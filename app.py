@@ -2,6 +2,7 @@ import re
 import sqlite3
 from flask import Flask, redirect, render_template, request, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -14,6 +15,22 @@ app.config.update(dict(
 ))
 
 db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255), unique=True)
+    first_name = db.Column(db.String(255), unique=True)
+    last_name = db.Column(db.String(255), unique=True)
+
+    def __init__(self, username, password, first_name, last_name):
+        self.username = username
+        self.password = generate_password_hash(password)
+        self.first_name = first_name
+        self.last_name = last_name
+
+    def __repr__(self):
+        return '<User %r>' % self.username
 
 class Site(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,7 +69,32 @@ def login():
 
 @app.route('/users')
 def users():
-    return render_template('users/users.html', title='Users')
+    users = User.query.all()
+
+    return render_template('users/users.html', title='Users', users=users)
+
+@app.route('/users/add', methods=['GET', 'POST'])
+def users_add():
+    if request.method == 'POST':
+        user = User(
+            request.form['username'],
+            request.form['password'],
+            request.form['first_name'],
+            request.form['last_name']
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('users'))
+
+    return render_template('users/add.html')
+
+@app.route('/users/<string:username>/edit', methods=['GET', 'POST'])
+def users_edit(username):
+    user = User.query.filter_by(username=username).first()
+
+    return render_template('users/edit.html', title='', user=user)
 
 @app.route('/sites')
 def sites():
@@ -75,10 +117,6 @@ def sites_add():
         return redirect(url_for('sites'))
 
     return render_template('sites/add.html')
-
-@app.route('/sites/<string:slug>')
-def sites_item(slug):
-    return render_template('sites/item.html', title=slug)
 
 @app.route('/sites/<string:slug>/edit', methods=['GET', 'POST'])
 def sites_edit(slug):

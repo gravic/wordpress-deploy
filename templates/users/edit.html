@@ -1,0 +1,9 @@
+{% extends '_layout.html' %}
+{% block body %}
+    <form method="POST">
+        <input class="form-control" type="text" name="username" value="{{user.username}}">
+        <input class="form-control" type="text" name="first_name" value="{{user.first_name}}">
+        <input class="form-control" type="text" name="last_name" value="{{user.last_name}}">
+        <input class="btn btn-primary" type="submit" value="Add">
+    </form>
+{% endblock %}
