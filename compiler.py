@@ -77,7 +77,7 @@ class Compiler(object):
             self.completed.append(url)
 
     def to_path(self, url):
-        path = os.path.join(self.output_dir, url.replace(self.testing_url, '')).replace('/', '\\')
+        path = os.path.abspath(os.path.join(self.output_dir, url.replace(self.testing_url, '')))
 
         return path
 
