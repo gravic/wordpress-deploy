@@ -4,15 +4,16 @@ from flask import Flask, redirect, render_template, Response, request, session, 
 from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+import settings as SETTINGS
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.update(dict(
     SQLALCHEMY_DATABASE_URI='sqlite:///db/deploy.db',
-    USERNAME='',
-    PASSWORD='',
-    SECRET_KEY='SECRET_KEY',
+    USERNAME=SETTINGS.DB_USERNAME,
+    PASSWORD=SETTINGS.DB_PASSWORD,
+    SECRET_KEY=SETTINGS.SECRET_KEY,
     DEBUG=True
 ))
 
