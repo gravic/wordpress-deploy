@@ -72,38 +72,38 @@ class Compiler(object):
             with open(output_path, 'w+') as f:
                 f.write(content)
 
-        def crawl_js(self, url):
+    def crawl_js(self, url):
+        try:
+            html = urlopen(url).read()
+        except HTTPError, err:
+            if err.code == 404:
+                return
+
+        soup = BeautifulSoup(html)
+
+        scripts = soup.find_all('script')
+
+        for script in scripts:
             try:
-                html = urlopen(url).read()
+                if not script.has_attr('src'):
+                    continue
+                if not 'http' in script['src']:
+                    continue
+
+                content = urlopen(script['src']).read()
             except HTTPError, err:
                 if err.code == 404:
                     return
 
-            soup = BeautifulSoup(html)
+            output_path = self.to_path(script['src'])
 
-            scripts = soup.find_all('script')
+            directory = os.path.dirname(output_path)
 
-            for script in scripts:
-                try:
-                    if not script.has_attr('src'):
-                        continue
-                    if not 'http' in script['src']:
-                        continue
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
-                    content = urlopen(script['src']).read()
-                except HTTPError, err:
-                    if err.code == 404:
-                        return
-
-                output_path = self.to_path(script['src'])
-
-                directory = os.path.dirname(output_path)
-
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-
-                with open(output_path, 'w+') as f:
-                    f.write(content)
+            with open(output_path, 'w+') as f:
+                f.write(content)
 
     def is_valid(self, ele):
         if not ele.has_attr('href'):
