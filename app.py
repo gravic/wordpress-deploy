@@ -4,6 +4,7 @@ from flask import Flask, redirect, render_template, Response, request, session, 
 from flask.ext.sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from compiler import Compiler
 import settings as SETTINGS
 
 app = Flask(__name__)
@@ -173,6 +174,17 @@ def sites_edit(slug):
         return redirect(url_for('sites'))
 
     return render_template('sites/edit.html', title='Edit Site', site=site)
+
+@app.route('/sites/<string:slug>/deploy', methods=['GET', 'POST'])
+@authorize
+def sites_deploy(slug):
+    site = Site.query.filter_by(slug=slug).first()
+
+    compiler = Compiler('', site.testing_url, site.production_url)
+
+    compiler.compile()
+
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run()
