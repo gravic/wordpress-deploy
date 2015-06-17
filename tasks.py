@@ -1,10 +1,13 @@
 from app import celery
 from compiler import Compiler
+from archiver import Archiver
 
 @celery.task
-def compile_site(slug, testing_url, production_url):
+def deploy(slug, testing_url, production_url):
     compiler = Compiler('./test/', testing_url, production_url)
 
     compiler.compile()
+
+    archiver = Archiver()
 
     return True
