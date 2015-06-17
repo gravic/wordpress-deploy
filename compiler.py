@@ -16,7 +16,6 @@ class Compiler(object):
         self.skipped = []
 
     def crawl(self, url):
-        print 'Crawling ' + url
         try:
             html = urlopen(url).read()
         except HTTPError, err:
@@ -41,6 +40,70 @@ class Compiler(object):
                 continue
 
             self.crawl(link['href'])
+
+    def crawl_css(self, url):
+        try:
+            html = urlopen(url).read()
+        except HTTPError, err:
+            if err.code == 404:
+                return
+
+        soup = BeautifulSoup(html)
+
+        links = soup.find_all('link')
+
+        for link in links:
+            try:
+                if not 'http' in link['href']:
+                    continue
+
+                content = urlopen(link['href']).read()
+            except HTTPError, err:
+                if err.code == 404:
+                    return
+
+            output_path = self.to_path(link['href'])
+
+            directory = os.path.dirname(output_path)
+
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            with open(output_path, 'w+') as f:
+                f.write(content)
+
+        def crawl_js(self, url):
+            try:
+                html = urlopen(url).read()
+            except HTTPError, err:
+                if err.code == 404:
+                    return
+
+            soup = BeautifulSoup(html)
+
+            scripts = soup.find_all('script')
+
+            for script in scripts:
+                try:
+                    if not script.has_attr('src'):
+                        continue
+                    if not 'http' in script['src']:
+                        continue
+
+                    content = urlopen(script['src']).read()
+                except HTTPError, err:
+                    if err.code == 404:
+                        return
+
+                output_path = self.to_path(script['src'])
+
+                directory = os.path.dirname(output_path)
+
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+
+                with open(output_path, 'w+') as f:
+                    f.write(content)
 
     def is_valid(self, ele):
         if not ele.has_attr('href'):
@@ -94,7 +157,12 @@ class Compiler(object):
         self.crawl(self.testing_url)
         end = datetime.now()
 
-        # self.crawl_css(BASE_URL)
-        # self.crawl_js(BASE_URL)
+        self.crawl_css(self.testing_url)
+        self.crawl_js(self.testing_url)
 
         print 'Crawled {0} pages in {1}'.format(len(self.completed), end - start)
+
+if __name__ == '__main__':
+    compiler = Compiler('./test/', 'http://gravictest2/remark/', 'http://remarksoftware.com')
+
+    compiler.compile()
