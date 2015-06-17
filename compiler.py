@@ -8,7 +8,7 @@ from datetime import datetime
 
 class Compiler(object):
     def __init__(self, output_dir, testing_url, production_url):
-        self.output_dir = 'C:/Projects/Proof of Concept/crawler/dist/'
+        self.output_dir = './test/'
         self.testing_url = testing_url
         self.production_url = production_url
 
