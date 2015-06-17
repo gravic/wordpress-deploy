@@ -24,7 +24,7 @@ app.config.update(dict(
 db = SQLAlchemy(app)
 
 def make_celery(app):
-    celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
+    celery = Celery('tasks', broker=app.config['CELERY_BROKER_URL'])
     celery.conf.update(app.config)
     TaskBase = celery.Task
     class ContextTask(TaskBase):
@@ -36,6 +36,8 @@ def make_celery(app):
     return celery
 
 celery = make_celery(app)
+
+import tasks
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -197,17 +199,10 @@ def sites_edit(slug):
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
-    result = compile.delay(site)
+    result = tasks.compile.delay()
     result.wait()
 
     return redirect(url_for('index'))
-
-@celery.task
-def compile(site):
-    print 'Celery!'
-    # compiler = Compiler('', site.testing_url, site.production_url)
-
-    # compiler.compile()
 
 if __name__ == '__main__':
     app.run()
