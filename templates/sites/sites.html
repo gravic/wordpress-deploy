@@ -1,0 +1,23 @@
+{% extends '_layout.html' %}
+{% block body %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th><i class="fa fa-pencil fa-fw"></i></th>
+                <th>Name</th>
+                <th>Testing URL</th>
+                <th>Production URL</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for site in sites %}
+            <tr>
+                <td><a href="{{ url_for('sites_edit', slug=site.slug) }}"><i class="fa fa-pencil fa-fw"></i></a></td>
+                <td>{{site.name}}</td>
+                <td>{{site.testing}}</td>
+                <td>{{site.production}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

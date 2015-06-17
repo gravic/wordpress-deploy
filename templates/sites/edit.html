@@ -1,0 +1,9 @@
+{% extends '_layout.html' %}
+{% block body %}
+    <form method="POST">
+        <input class="form-control" type="text" name="name" value="{{site.name}}">
+        <input class="form-control" type="url" name="testing" value="{{site.testing}}">
+        <input class="form-control" type="url" name="production" value="{{site.production}}">
+        <input class="btn btn-primary" type="submit" value="Update">
+    </form>
+{% endblock %}

@@ -2,6 +2,10 @@
 # Project
 #
 
+# Database
+db/*.db
+
+# Build folder
 dist/
 
 #
