@@ -1,3 +1,4 @@
+import os
 import re
 import sqlite3
 from flask import Flask, redirect, render_template, Response, request, session, url_for
@@ -95,6 +96,15 @@ active_tasks = dict()
 def index():
     sites = Site.query.all()
 
+    archives = dict()
+
+    for site in sites:
+        archive_dir = os.path.join('./dist/archive/', site.slug)
+        if not os.path.exists(archive_dir):
+            continue
+        site_archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
+        archives[site.slug] = site_archives
+
     completed = []
 
     for site, task in active_tasks.iteritems():
@@ -104,7 +114,7 @@ def index():
     for task in completed:
         active_tasks.pop(task)
 
-    return render_template('index.html', title='Home', sites=sites, tasks=active_tasks)
+    return render_template('index.html', title='Home', sites=sites, tasks=active_tasks, archives=archives)
 
 @app.errorhandler(404)
 def error_404(error):
