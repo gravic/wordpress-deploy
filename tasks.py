@@ -16,7 +16,7 @@ def deploy(slug, testing_url, production_url):
     archiver = Archiver(slug, build_dir, archive_dir)
     archive = archiver.archive()
 
-    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.PRODUCTION_DIR)
+    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.SSH_KEY, SETTINGS.PRODUCTION_DIR)
     deployer.deploy(archive)
 
     return True
