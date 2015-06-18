@@ -105,6 +105,8 @@ def index():
         site_archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
         archives[site.slug] = site_archives
 
+    archives.sort()
+
     completed = []
 
     for site, task in active_tasks.iteritems():
