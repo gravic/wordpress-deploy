@@ -8,6 +8,8 @@ def deploy(slug, testing_url, production_url):
 
     compiler.compile()
 
-    archiver = Archiver()
+    archiver = Archiver(slug, './test/')
+
+    archiver.archive()
 
     return True
