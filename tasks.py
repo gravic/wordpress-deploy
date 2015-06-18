@@ -1,7 +1,9 @@
 import os
 from app import celery
-from compiler import Compiler
 from archiver import Archiver
+from compiler import Compiler
+from deployer import Deployer
+import settings as SETTINGS
 
 @celery.task
 def deploy(slug, testing_url, production_url):
@@ -9,11 +11,12 @@ def deploy(slug, testing_url, production_url):
     archive_dir = os.path.join('./dist/archive/', slug)
 
     compiler = Compiler(build_dir, testing_url, production_url)
-
     compiler.compile()
 
     archiver = Archiver(slug, build_dir, archive_dir)
+    archive = archiver.archive()
 
-    archiver.archive()
+    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.PRODUCTION_DIR)
+    deployer.deploy(archive)
 
     return True

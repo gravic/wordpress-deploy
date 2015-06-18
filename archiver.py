@@ -19,3 +19,5 @@ class Archiver(object):
         tar = tarfile.open(archive_path, 'w:bz2')
         tar.add(self.input_dir, arcname='')
         tar.close()
+
+        return archive_path
