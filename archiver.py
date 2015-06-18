@@ -12,7 +12,7 @@ class Archiver(object):
             os.makedirs(self.output_dir)
 
     def archive(self):
-        timestamp = str(datetime.now()).split('.')[0].replace(' ', '_')
+        timestamp = str(datetime.now()).split('.')[0].replace(' ', '_').replace(':', '-')
         archive_name = '{0}_{1}.tar.bz2'.format(self.site, timestamp)
         archive_path = os.path.join(self.output_dir, archive_name)
 
