@@ -8,6 +8,9 @@ class Archiver(object):
         self.input_dir = input_dir
         self.output_dir = os.path.abspath(output_dir)
 
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
     def archive(self):
         timestamp = str(datetime.now()).split('.')[0].replace(' ', '_')
         archive_name = '{0}_{1}.tar.bz2'.format(self.site, timestamp)
