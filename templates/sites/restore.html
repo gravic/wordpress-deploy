@@ -1,0 +1,25 @@
+{% extends '_layout.html' %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-8">
+            <div class="text-center">
+                <h1>Restore Site</h1>
+            </div>
+            <form method="POST">
+                <div class="form-group">
+                    <label class="control-label" for="backup">Backup</label>
+                    <select class="form-control" name="backup">
+                    {% for archive in archives %}
+                        <option>{{archive}}</option>
+                    {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group pull-right">
+                    <a class="btn btn-default" href="{{url_for('index')}}">Cancel</a>
+                    <input class="btn btn-primary" type="submit" value="Restore Site">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

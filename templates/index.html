@@ -17,11 +17,14 @@
                         <td>
                             {% if site.slug in tasks %}
                                 <a class="btn btn-primary disabled">Deploying&nbsp;<i class="fa fa-spinner fa-spin fa-fw"></i></a>
+                                <a class="btn btn-default disabled">Restore</a>
                             {% else %}
                                 {% if authed_user.can_access(site.slug) or authed_user.is_admin %}
                                     <a class="btn btn-primary" href="{{url_for('sites_deploy', slug=site.slug)}}">Deploy</a>
+                                    <a class="btn btn-default" href="{{url_for('sites_restore', slug=site.slug)}}">Restore</a>
                                 {% else %}
                                     <a class="btn btn-primary disabled">Deploy</a>
+                                    <a class="btn btn-default disabled">Restore</a>
                                 {% endif %}
                             {% endif %}
                         </td>
