@@ -20,7 +20,7 @@
                 {% for user in users %}
                     <tr>
                         <td>
-                            {% if authed_user.id == user.id %}
+                            {% if authed_user.id == user.id or authed_user.is_admin %}
                                 <a href="{{url_for('users_edit', username=user.username)}}"><i class="fa fa-pencil fa-fw"></i></a>
                             {% else %}
                                 <i class="fa fa-pencil fa-fw"></i>

@@ -46,13 +46,15 @@ class User(db.Model):
     password = db.Column(db.String(255), unique=True)
     first_name = db.Column(db.String(255), unique=True)
     last_name = db.Column(db.String(255), unique=True)
+    is_admin = db.Column(db.Boolean)
     permissions = db.relationship('Site', backref='site', secondary='permissions', lazy='dynamic')
 
     def __init__(self, username, password, first_name, last_name):
-        self.username = username
+        self.username = username.lower()
         self.password = generate_password_hash(password)
         self.first_name = first_name
         self.last_name = last_name
+        self.is_admin = False
 
     def can_access(self, slug):
         return any(slug == site.slug for site in self.permissions)
@@ -212,7 +214,7 @@ def users_edit(username):
 
         return redirect(url_for('users'))
 
-    return render_template('users/edit.html', title='Edit User', authed_user=get_authed_user(), sites=sites)
+    return render_template('users/edit.html', title='Edit User', user=user, sites=sites)
 
 @app.route('/sites')
 @authorize
