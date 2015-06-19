@@ -16,9 +16,13 @@
                         <td>{{site.name}}</td>
                         <td>
                             {% if site.slug in tasks %}
-                                <a class="btn btn-primary disabled" href="{{url_for('sites_deploy', slug=site.slug)}}">Deploying&nbsp;<i class="fa fa-spinner fa-spin fa-fw"></i></a>
+                                <a class="btn btn-primary disabled">Deploying&nbsp;<i class="fa fa-spinner fa-spin fa-fw"></i></a>
                             {% else %}
-                                <a class="btn btn-primary" href="{{url_for('sites_deploy', slug=site.slug)}}">Deploy</a>
+                                {% if authed_user.can_access(site.slug) %}
+                                    <a class="btn btn-primary" href="{{url_for('sites_deploy', slug=site.slug)}}">Deploy</a>
+                                {% else %}
+                                    <a class="btn btn-primary disabled">Deploy</a>
+                                {% endif %}
                             {% endif %}
                         </td>
                         <td>

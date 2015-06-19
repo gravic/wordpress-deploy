@@ -46,12 +46,16 @@ class User(db.Model):
     password = db.Column(db.String(255), unique=True)
     first_name = db.Column(db.String(255), unique=True)
     last_name = db.Column(db.String(255), unique=True)
+    permissions = db.relationship('Site', backref='site', secondary='permissions', lazy='dynamic')
 
     def __init__(self, username, password, first_name, last_name):
         self.username = username
         self.password = generate_password_hash(password)
         self.first_name = first_name
         self.last_name = last_name
+
+    def can_access(self, slug):
+        return any(slug == site.slug for site in self.permissions)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -72,12 +76,20 @@ class Site(db.Model):
     def __repr__(self):
         return '<Site %r>' % self.slug
 
+permissions = db.Table('permissions',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('site_id', db.Integer, db.ForeignKey('site.id'))
+)
+
 def generate_slug(string):
     string = re.sub(r'\s', '-', string)
     string = re.sub(r'[^A-Za-z0-9\-]', '', string)
     string = re.sub(r'--', '-', string)
 
     return string.lower()
+
+def get_authed_user():
+    return User.query.filter_by(username=session.get('username')).first()
 
 def authorize(f):
     @wraps(f)
@@ -115,7 +127,7 @@ def index():
     for task in completed:
         active_tasks.pop(task)
 
-    return render_template('index.html', title='Home', sites=sites, tasks=active_tasks, archives=archives)
+    return render_template('index.html', title='Home', authed_user=get_authed_user(), sites=sites, tasks=active_tasks, archives=archives)
 
 @app.errorhandler(404)
 def error_404(error):
@@ -149,11 +161,13 @@ def logout():
 def users():
     users = User.query.all()
 
-    return render_template('users/users.html', title='Users', users=users)
+    return render_template('users/users.html', title='Users', authed_user=get_authed_user(), users=users)
 
 @app.route('/users/add', methods=['GET', 'POST'])
 @authorize
 def users_add():
+    sites = Site.query.all()
+
     if request.method == 'POST':
         user = User(
             request.form['username'],
@@ -162,26 +176,50 @@ def users_add():
             request.form['last_name']
         )
 
+        for site in sites:
+            key = 'site_{0}'.format(site.slug)
+
+            if request.form.has_key(key):
+                user.permissions.extend([site for site in sites if key.replace('site_', '') == site.slug])
+
         db.session.add(user)
         db.session.commit()
 
         return redirect(url_for('users'))
 
-    return render_template('users/add.html', title='Add User')
+    return render_template('users/add.html', title='Add User', sites=sites)
 
 @app.route('/users/<string:username>/edit', methods=['GET', 'POST'])
 @authorize
 def users_edit(username):
     user = User.query.filter_by(username=username).first()
+    sites = Site.query.all()
 
-    return render_template('users/edit.html', title='Edit User', user=user)
+    if request.method == 'POST':
+        user.username = request.form['username']
+        user.password = generate_password_hash(request.form['password'])
+        user.first_name = request.form['first_name']
+        user.last_name = request.form['last_name']
+        user.permissions = []
+
+        for site in sites:
+            key = 'site_{0}'.format(site.slug)
+
+            if request.form.has_key(key):
+                user.permissions.extend([site for site in sites if key.replace('site_', '') == site.slug])
+
+        db.session.commit()
+
+        return redirect(url_for('users'))
+
+    return render_template('users/edit.html', title='Edit User', authed_user=get_authed_user(), sites=sites)
 
 @app.route('/sites')
 @authorize
 def sites():
     sites = Site.query.all()
 
-    return render_template('sites/sites.html', title='Sites', sites=sites)
+    return render_template('sites/sites.html', title='Sites', authed_user=get_authed_user(), sites=sites)
 
 @app.route('/sites/add', methods=['GET', 'POST'])
 @authorize

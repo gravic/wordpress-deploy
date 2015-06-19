@@ -19,7 +19,13 @@
                 <tbody>
                 {% for site in sites %}
                     <tr>
-                        <td><a href="{{ url_for('sites_edit', slug=site.slug) }}"><i class="fa fa-pencil fa-fw"></i></a></td>
+                        <td>
+                            {% if authed_user.can_access(site.slug) %}
+                                <a href="{{ url_for('sites_edit', slug=site.slug) }}"><i class="fa fa-pencil fa-fw"></i></a>
+                            {% else %}
+                                <i class="fa fa-pencil fa-fw"></i>
+                            {% endif %}
+                        </td>
                         <td>{{site.name}}</td>
                         <td><a href="{{site.testing_url}}" target="_blank">{{site.testing_url}}</a></td>
                         <td><a href="{{site.production_url}}" target="_blank">{{site.production_url}}</a></td>
