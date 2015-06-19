@@ -208,10 +208,12 @@ def users_edit(username):
     user = User.query.filter_by(username=username).first()
     sites = Site.query.all()
 
+    placeholder_password = '********'
+
     if request.method == 'POST':
         user.username = generate_slug(request.form['username'])
 
-        if not request.form['password'] == '********':
+        if not request.form['password'] == placeholder_password:
             user.password = generate_password_hash(request.form['password'])
 
         user.first_name = request.form['first_name']
@@ -228,7 +230,7 @@ def users_edit(username):
 
         return redirect(url_for('users'))
 
-    return render_template('users/edit.html', title='Edit User', user=user, sites=sites)
+    return render_template('users/edit.html', title='Edit User', user=user, placeholder_password=placeholder_password, sites=sites)
 
 @app.route('/users/<string:username>/delete')
 @authorize
