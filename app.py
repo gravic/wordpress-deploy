@@ -34,7 +34,7 @@ class User(db.Model):
     permissions = db.relationship('Site', backref='site', secondary='permissions', lazy='dynamic')
 
     def __init__(self, username, password, first_name, last_name):
-        self.username = username.lower()
+        self.username = generate_slug(username)
         self.password = generate_password_hash(password)
         self.first_name = first_name
         self.last_name = last_name
@@ -209,7 +209,7 @@ def users_edit(username):
     sites = Site.query.all()
 
     if request.method == 'POST':
-        user.username = request.form['username']
+        user.username = generate_slug(request.form['username'])
 
         if not request.form['password'] == '********':
             user.password = generate_password_hash(request.form['password'])
