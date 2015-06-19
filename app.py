@@ -210,7 +210,10 @@ def users_edit(username):
 
     if request.method == 'POST':
         user.username = request.form['username']
-        user.password = generate_password_hash(request.form['password'])
+
+        if not request.form['password'] == '********':
+            user.password = generate_password_hash(request.form['password'])
+
         user.first_name = request.form['first_name']
         user.last_name = request.form['last_name']
         user.permissions = []
