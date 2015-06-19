@@ -15,5 +15,5 @@ class Deployer(object):
             production=self.production_url,
             directory=self.target_dir
         )
-        print command
-        result = subprocess.call(command, shell=True)
+
+        result = subprocess.check_call(command, shell=True)

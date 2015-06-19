@@ -297,8 +297,6 @@ def sites_restore(slug):
 
         result = tasks.restore.delay(site.slug, archive)
 
-        print result
-
         return redirect(url_for('index'))
 
     return render_template('sites/restore.html', title='Restore Site', site=site, archives=archives)
