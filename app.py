@@ -256,7 +256,7 @@ def sites_edit(slug):
 
     return render_template('sites/edit.html', title='Edit Site', site=site)
 
-@app.route('/sites/<string:slug>/deploy', methods=['GET', 'POST'])
+@app.route('/sites/<string:slug>/deploy')
 @authorize
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
