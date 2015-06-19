@@ -304,4 +304,4 @@ def sites_restore(slug):
     return render_template('sites/restore.html', title='Restore Site', site=site, archives=archives)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
