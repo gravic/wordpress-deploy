@@ -227,6 +227,17 @@ def users_edit(username):
 
     return render_template('users/edit.html', title='Edit User', user=user, sites=sites)
 
+@app.route('/users/<string:username>/delete')
+@authorize
+@admin
+def users_delete(username):
+    user = User.query.filter_by(username=username).first()
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return redirect(url_for('users'))
+
 @app.route('/sites')
 @authorize
 def sites():
@@ -268,6 +279,17 @@ def sites_edit(slug):
         return redirect(url_for('sites'))
 
     return render_template('sites/edit.html', title='Edit Site', site=site)
+
+@app.route('/sites/<string:slug>/delete')
+@authorize
+@admin
+def sites_delete(slug):
+    site = Site.query.filter_by(slug=slug).first()
+
+    db.session.delete(site)
+    db.session.commit()
+
+    return redirect(url_for('sites'))
 
 @app.route('/sites/<string:slug>/deploy')
 @authorize
