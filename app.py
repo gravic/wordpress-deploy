@@ -259,6 +259,7 @@ def sites_edit(slug):
 
     if request.method == 'POST':
         site.name = request.form['name']
+        site.slug = generate_slug(request.form['name'])
         site.testing_url = request.form['testing_url']
         site.production_url = request.form['production_url']
 
