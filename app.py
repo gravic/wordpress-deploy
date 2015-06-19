@@ -295,7 +295,7 @@ def sites_restore(slug):
     if request.method == 'POST':
         archive = request.form['archive']
 
-        result = tasks.restore.delay(archive)
+        result = tasks.restore.delay(site.slug, archive)
 
         print result
 

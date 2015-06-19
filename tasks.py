@@ -22,6 +22,8 @@ def deploy(slug, testing_url, production_url):
     return True
 
 @celery.task
-def restore(archive):
-    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.SSH_KEY, SETTINGS.PRODUCTION_DIR)
+def restore(slug, archive):
+    archive_dir = os.path.join('./dist/archive/', slug)
+
+    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.SSH_KEY, archive_dir, SETTINGS.PRODUCTION_DIR)
     deployer.deploy(archive)
