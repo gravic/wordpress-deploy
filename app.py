@@ -292,16 +292,14 @@ def sites_restore(slug):
     archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
     archives.sort()
 
-    # for site in sites:
-    #     archive_dir = os.path.join('./dist/archive/', site.slug)
-    #     if not os.path.exists(archive_dir):
-    #         continue
-    #     site_archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
-    #     site_archives.sort()
-    #     archives[site.slug] = site_archives
-
     if request.method == 'POST':
-        pass
+        archive = request.form['archive']
+
+        result = tasks.restore.delay(archive)
+
+        print result
+
+        return redirect(url_for('index'))
 
     return render_template('sites/restore.html', title='Restore Site', site=site, archives=archives)
 
