@@ -103,6 +103,16 @@ def authorize(f):
 
     return decorated
 
+def admin(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not get_authed_user().is_admin:
+            return redirect(request.headers['Referer'])
+
+        return f(*args, **kwargs)
+
+    return decorated
+
 active_tasks = dict()
 
 @app.route('/')
@@ -167,6 +177,7 @@ def users():
 
 @app.route('/users/add', methods=['GET', 'POST'])
 @authorize
+@admin
 def users_add():
     sites = Site.query.all()
 
@@ -225,6 +236,7 @@ def sites():
 
 @app.route('/sites/add', methods=['GET', 'POST'])
 @authorize
+@admin
 def sites_add():
     if request.method == 'POST':
         site = Site(
