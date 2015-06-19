@@ -18,7 +18,7 @@
                             {% if site.slug in tasks %}
                                 <a class="btn btn-primary disabled">Deploying&nbsp;<i class="fa fa-spinner fa-spin fa-fw"></i></a>
                             {% else %}
-                                {% if authed_user.can_access(site.slug) %}
+                                {% if authed_user.can_access(site.slug) or authed_user.is_admin %}
                                     <a class="btn btn-primary" href="{{url_for('sites_deploy', slug=site.slug)}}">Deploy</a>
                                 {% else %}
                                     <a class="btn btn-primary disabled">Deploy</a>
