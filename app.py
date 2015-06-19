@@ -24,22 +24,6 @@ app.config.update(dict(
 
 db = SQLAlchemy(app)
 
-def make_celery(app):
-    celery = Celery('tasks', broker=app.config['CELERY_BROKER_URL'])
-    celery.conf.update(app.config)
-    TaskBase = celery.Task
-    class ContextTask(TaskBase):
-        abstract = True
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-    celery.Task = ContextTask
-    return celery
-
-celery = make_celery(app)
-
-import tasks
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), unique=True)
@@ -89,6 +73,22 @@ def generate_slug(string):
     string = re.sub(r'--', '-', string)
 
     return string.lower()
+
+def make_celery(app):
+    celery = Celery('tasks', broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
+
+celery = make_celery(app)
+
+import tasks
 
 def get_authed_user():
     return User.query.filter_by(username=session.get('username')).first()
