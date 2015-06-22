@@ -153,7 +153,7 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if check_password_hash(user.password, password):
+        if not user is None and check_password_hash(user.password, password):
             session['username'] = user.username
 
             return redirect(url_for('index'))
@@ -315,8 +315,10 @@ def sites_restore(slug):
     archives = []
 
     archive_dir = os.path.join('./dist/archive/', site.slug)
-    # if not os.path.exists(archive_dir):
-    #     continue
+
+    if not os.path.exists(archive_dir):
+        return redirect(url_for('index'))
+
     archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
     archives.sort()
 
