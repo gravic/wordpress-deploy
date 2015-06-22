@@ -1,0 +1,3 @@
+#!/bin/sh
+
+celery multi start 3 -A app.celery -l info --pidfile=./workers/%N.pid --logfile=./workers/%N.log

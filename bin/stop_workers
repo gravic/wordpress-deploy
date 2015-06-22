@@ -1,0 +1,3 @@
+#!/bin/sh
+
+celery multi stop 3 --pidfile=./workers/%N.pid --logfile=./workers/%N.log
