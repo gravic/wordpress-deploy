@@ -10,7 +10,7 @@ class Compiler(object):
     def __init__(self, output_dir, testing_url, production_url):
         self.output_dir = os.path.abspath(output_dir)
         self.testing_url = testing_url
-        self.production_url = production_url
+        self.production_url = production_url if production_url[-1] == '/' else production_url + '/'
 
         self.completed = []
         self.skipped = []
