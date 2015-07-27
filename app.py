@@ -260,7 +260,8 @@ def sites_add():
         site = Site(
             request.form['name'],
             request.form['testing_url'],
-            request.form['production_url']
+            request.form['production_url'],
+            request.form['testing_url']
         )
 
         db.session.add(site)
@@ -280,6 +281,7 @@ def sites_edit(slug):
         site.slug = generate_slug(request.form['name'])
         site.testing_url = request.form['testing_url']
         site.production_url = request.form['production_url']
+        site.testing_url = request.form['testing_url']
 
         db.session.commit()
 
