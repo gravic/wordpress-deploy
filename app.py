@@ -52,12 +52,14 @@ class Site(db.Model):
     name = db.Column(db.String(255), unique=True)
     testing_url = db.Column(db.String(255), unique=False)
     production_url = db.Column(db.String(255), unique=False)
+    theme_url = db.Column(db.String(255), unique=False)
 
-    def __init__(self, name, testing_url, production_url):
+    def __init__(self, name, testing_url, production_url, theme_url):
         self.slug = generate_slug(name)
         self.name = name
         self.testing_url = testing_url
         self.production_url = production_url
+        self.theme_url = theme_url
 
     def __repr__(self):
         return '<Site %r>' % self.slug
@@ -301,7 +303,7 @@ def sites_delete(slug):
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
-    result = tasks.deploy.delay(site.slug, site.testing_url, site.production_url)
+    result = tasks.deploy.delay(site.slug, site.testing_url, site.production_url, site.theme_url)
 
     active_tasks[slug] = result
 

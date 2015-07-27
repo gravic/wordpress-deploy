@@ -6,11 +6,11 @@ from deployer import Deployer
 import settings as SETTINGS
 
 @celery.task
-def deploy(slug, testing_url, production_url):
+def deploy(slug, testing_url, production_url, theme_url):
     build_dir = os.path.join('./dist/build/', slug)
     archive_dir = os.path.join('./dist/archive/', slug)
 
-    compiler = Compiler(build_dir, testing_url, production_url)
+    compiler = Compiler(build_dir, testing_url, production_url, theme_url)
     compiler.compile()
 
     archiver = Archiver(slug, build_dir, archive_dir)
