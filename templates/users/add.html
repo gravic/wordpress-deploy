@@ -24,13 +24,16 @@
                     <input class="form-control" type="text" name="last_name">
                 </div>
                 <div class="form-group">
-                {% for site in sites %}
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="site_{{site.slug}}"> {{site.name}}
-                        </label>
+                    <label class="control-label">Website Permissions</label>
+                    <div class="indent-10">
+                    {% for site in sites %}
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="site_{{site.slug}}"> {{site.name}}
+                            </label>
+                        </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
                 </div>
                 <div class="form-group pull-right">
                     <a class="btn btn-default" href="{{url_for('users')}}">Cancel</a>

@@ -5,3 +5,7 @@ body {
 .table {
     margin-top: 20px;
 }
+
+.indent-10 {
+    margin-left: 10px;
+}
