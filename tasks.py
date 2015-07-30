@@ -7,8 +7,8 @@ import settings as SETTINGS
 
 @celery.task
 def deploy(slug, testing_url, production_url, theme_url):
-    build_dir = os.path.join('./dist/build/', slug)
-    archive_dir = os.path.join('./dist/archive/', slug)
+    build_dir = os.path.join(SETTINGS.BUILD_DIR, slug)
+    archive_dir = os.path.join(SETTINGS.ARCHIVE_DIR, slug)
 
     compiler = Compiler(build_dir, testing_url, production_url, theme_url)
     compiler.compile()
@@ -23,7 +23,7 @@ def deploy(slug, testing_url, production_url, theme_url):
 
 @celery.task
 def restore(slug, archive):
-    archive_dir = os.path.join('./dist/archive/', slug)
+    archive_dir = os.path.join(SETTINGS.ARCHIVE_DIR, slug)
 
     deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.SSH_KEY, archive_dir, SETTINGS.PRODUCTION_DIR)
     deployer.deploy(archive)
