@@ -1,0 +1,27 @@
+{% extends '_layout.html' %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Site</th>
+                        <th>Username</th>
+                        <th>Type</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for record in history %}
+                    <tr>
+                        <td>{{record.site[0].name}}</td>
+                        <td>{{record.user[0].username}}</td>
+                        <td>{{record.type}}</td>
+                        <td>{{record.timestamp}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
