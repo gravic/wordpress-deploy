@@ -53,13 +53,17 @@ class Site(db.Model):
     testing_url = db.Column(db.String(255), unique=False)
     production_url = db.Column(db.String(255), unique=False)
     theme_url = db.Column(db.String(255), unique=False)
+    production_server = db.Column(db.String(255), unique=False)
+    production_dir = db.Column(db.String(255), unique=False)
 
-    def __init__(self, name, testing_url, production_url, theme_url):
+    def __init__(self, name, testing_url, production_url, theme_url, production_server, production_dir):
         self.slug = generate_slug(name)
         self.name = name
         self.testing_url = testing_url
         self.production_url = production_url
         self.theme_url = theme_url
+        self.production_server = production_server
+        self.production_dir = production_dir
 
     def __repr__(self):
         return '<Site %r>' % self.slug
@@ -261,7 +265,9 @@ def sites_add():
             request.form['name'],
             request.form['testing_url'],
             request.form['production_url'],
-            request.form['theme_url']
+            request.form['theme_url'],
+            request.form['production_server'],
+            request.form['production_dir']
         )
 
         db.session.add(site)
@@ -282,6 +288,8 @@ def sites_edit(slug):
         site.testing_url = request.form['testing_url']
         site.production_url = request.form['production_url']
         site.theme_url = request.form['theme_url']
+        site.production_server = request.form['production_server']
+        site.production_dir = request.form['production_dir']
 
         db.session.commit()
 
@@ -305,7 +313,7 @@ def sites_delete(slug):
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
 
-    result = tasks.deploy.delay(site.slug, site.testing_url, site.production_url, site.theme_url)
+    result = tasks.deploy.delay(site.slug, site.testing_url, site.production_url, site.theme_url, site.production_server, site.production_dir)
 
     active_tasks[slug] = result
 
@@ -329,7 +337,7 @@ def sites_restore(slug):
     if request.method == 'POST':
         archive = request.form['archive']
 
-        result = tasks.restore.delay(site.slug, archive)
+        result = tasks.restore.delay(site.slug, archive, site.production_server, site.production_dir)
 
         return redirect(url_for('index'))
 

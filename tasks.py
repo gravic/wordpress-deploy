@@ -6,7 +6,7 @@ from deployer import Deployer
 import settings as SETTINGS
 
 @celery.task
-def deploy(slug, testing_url, production_url, theme_url):
+def deploy(slug, testing_url, production_url, theme_url, production_server, production_dir):
     build_dir = os.path.join(SETTINGS.BUILD_DIR, slug)
     archive_dir = os.path.join(SETTINGS.ARCHIVE_DIR, slug)
 
@@ -16,14 +16,14 @@ def deploy(slug, testing_url, production_url, theme_url):
     archiver = Archiver(slug, build_dir, archive_dir)
     archive = archiver.archive()
 
-    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.SSH_KEY, archive_dir, SETTINGS.PRODUCTION_DIR)
+    deployer = Deployer(production_server, SETTINGS.SSH_KEY, archive_dir, production_dir)
     deployer.deploy(archive)
 
     return True
 
 @celery.task
-def restore(slug, archive):
+def restore(slug, archive, production_server, production_dir):
     archive_dir = os.path.join(SETTINGS.ARCHIVE_DIR, slug)
 
-    deployer = Deployer(SETTINGS.PRODUCTION_SERVER, SETTINGS.SSH_KEY, archive_dir, SETTINGS.PRODUCTION_DIR)
+    deployer = Deployer(production_server, SETTINGS.SSH_KEY, archive_dir, production_dir)
     deployer.deploy(archive)
