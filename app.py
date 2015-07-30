@@ -34,7 +34,8 @@ class User(db.Model):
     first_name = db.Column(db.String(255), unique=True)
     last_name = db.Column(db.String(255), unique=True)
     is_admin = db.Column(db.Boolean)
-    permissions = db.relationship('Site', backref='user', secondary='permissions', lazy='dynamic')
+    sites = db.relationship('Site', backref='user', secondary='user_site', lazy='dynamic')
+    history = db.relationship('History', backref='user', secondary='user_history', lazy='dynamic')
 
     def __init__(self, username, password, first_name, last_name):
         self.username = generate_slug(username)
@@ -44,7 +45,7 @@ class User(db.Model):
         self.is_admin = False
 
     def can_access(self, slug):
-        return any(slug == site.slug for site in self.permissions)
+        return any(slug == site.slug for site in self.sites)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -60,6 +61,7 @@ class Site(db.Model):
     theme_url = db.Column(db.String(255), unique=False)
     production_server = db.Column(db.String(255), unique=False)
     production_dir = db.Column(db.String(255), unique=False)
+    history = db.relationship('History', backref='site', secondary='site_history', lazy='dynamic')
 
     def __init__(self, name, testing_url, production_url, theme_url, production_server, production_dir):
         self.slug = generate_slug(name)
@@ -80,9 +82,6 @@ class History(db.Model):
     type = db.Column(db.Enum('deploy', 'restore'))
     timestamp = db.Column(db.DateTime)
 
-    site = db.relationship('Site', backref='history', secondary='user_site_history', lazy='dynamic')
-    user = db.relationship('User', backref='history', secondary='user_site_history', lazy='dynamic')
-
     def __init__(self, site, user, type):
         self.site = [site]
         self.user = [user]
@@ -92,13 +91,17 @@ class History(db.Model):
     def __repr__(self):
         return '<History %r>' % self.id
 
-permissions = db.Table('permissions',
+user_site = db.Table('user_site',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('site_id', db.Integer, db.ForeignKey('site.id'))
 )
 
-user_site_history = db.Table('user_site_history',
+user_history = db.Table('user_history',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('history_id', db.Integer, db.ForeignKey('history.id'))
+)
+
+site_history = db.Table('site_history',
     db.Column('site_id', db.Integer, db.ForeignKey('site.id')),
     db.Column('history_id', db.Integer, db.ForeignKey('history.id'))
 )
@@ -229,7 +232,7 @@ def users_add():
             key = 'site_{0}'.format(site.slug)
 
             if request.form.has_key(key):
-                user.permissions.extend([site for site in sites if key.replace('site_', '') == site.slug])
+                user.sites.extend([site for site in sites if key.replace('site_', '') == site.slug])
 
         db.session.add(user)
         db.session.commit()
@@ -254,13 +257,13 @@ def users_edit(username):
 
         user.first_name = request.form['first_name']
         user.last_name = request.form['last_name']
-        user.permissions = []
+        user.sites = []
 
         for site in sites:
             key = 'site_{0}'.format(site.slug)
 
             if request.form.has_key(key):
-                user.permissions.extend([site for site in sites if key.replace('site_', '') == site.slug])
+                user.sites.extend([site for site in sites if key.replace('site_', '') == site.slug])
 
         db.session.commit()
 
