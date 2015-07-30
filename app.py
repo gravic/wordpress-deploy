@@ -344,7 +344,7 @@ def sites_delete(slug):
 @app.route('/history')
 @authorize
 def history():
-    history = History.query.all()
+    history = db.session.query(History).order_by(History.timestamp.desc()).all()
 
     return render_template('history/history.html', title='History', history=history)
 
