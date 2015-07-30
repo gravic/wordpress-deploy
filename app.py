@@ -155,7 +155,7 @@ def admin(f):
 @app.template_filter('date')
 def filter_date(value, format='medium'):
     if format == 'medium':
-        return value.strftime('%b %d, %Y %H:%M:%S %p')
+        return value.strftime('%b %d, %Y %I:%M:%S %p')
     else:
         return value
 
