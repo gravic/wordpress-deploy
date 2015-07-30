@@ -7,6 +7,7 @@
                     <tr>
                         <th>Site</th>
                         <th>Username</th>
+                        <th>Full Name</th>
                         <th>Type</th>
                         <th>Timestamp</th>
                     </tr>
@@ -16,7 +17,8 @@
                     <tr>
                         <td>{{record.site[0].name}}</td>
                         <td>{{record.user[0].username}}</td>
-                        <td>{{record.type}}</td>
+                        <td>{{record.user[0].first_name}}&nbsp;{{record.user[0].last_name}}</td>
+                        <td class="history-type">{{record.type}}</td>
                         <td>{{record.timestamp}}</td>
                     </tr>
                 {% endfor %}

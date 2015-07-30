@@ -9,3 +9,7 @@ body {
 .indent-10 {
     margin-left: 10px;
 }
+
+.history-type {
+    text-transform: uppercase;
+}
