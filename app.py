@@ -152,6 +152,13 @@ def admin(f):
 
     return decorated
 
+@app.template_filter('date')
+def filter_date(value, format='medium'):
+    if format == 'medium':
+        return value.strftime('%b %d, %Y %H:%M:%S %p')
+    else:
+        return value
+
 active_tasks = dict()
 
 @app.route('/')
@@ -352,10 +359,20 @@ def history():
 @authorize
 def sites_deploy(slug):
     site = Site.query.filter_by(slug=slug).first()
+    user = get_authed_user()
 
     result = tasks.deploy.delay(site.slug, site.testing_url, site.production_url, site.theme_url, site.production_server, site.production_dir)
 
     active_tasks[slug] = result
+
+    history = History(
+        site,
+        user,
+        'deploy'
+    )
+
+    db.session.add(history)
+    db.session.commit()
 
     return redirect(url_for('index'))
 
