@@ -390,6 +390,7 @@ def sites_restore(slug):
 
     archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
     archives.sort()
+    archives = reversed(archives)
 
     if request.method == 'POST':
         user = get_authed_user()
