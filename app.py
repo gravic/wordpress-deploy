@@ -169,7 +169,7 @@ def index():
     archives = dict()
 
     for site in sites:
-        archive_dir = os.path.join('./dist/archive/', site.slug)
+        archive_dir = os.path.join(SETTINGS.ARCHIVE_DIR, site.slug)
         if not os.path.exists(archive_dir):
             continue
         site_archives = [f for f in os.listdir(archive_dir) if os.path.isfile(os.path.join(archive_dir, f))]
@@ -383,7 +383,7 @@ def sites_restore(slug):
 
     archives = []
 
-    archive_dir = os.path.join('./dist/archive/', site.slug)
+    archive_dir = os.path.join(SETTINGS.ARCHIVE_DIR, site.slug)
 
     if not os.path.exists(archive_dir):
         return redirect(url_for('index'))
