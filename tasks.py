@@ -31,10 +31,10 @@ def restore(slug, archive, production_server, production_dir):
 
 @celery.task
 def rsync(theme_url, production_server, production_dir):
-    source_dir = os.path.join('/var/www/html/', get_site_dir(theme_url), 'uploads')
+    source_dir = os.path.join('/var/www/html/', get_site_dir(theme_url), 'wp-content/uploads')
     upload_dir = os.path.join(production_dir, 'wp-content/uploads')
 
-    command = 'cd {source_dir}; rsync -rt ./* -r \'ssh -i {ssh_key}\' {production}:{upload_dir}'.format(
+    command = 'cd {source_dir}; rsync -rt ./* -e \'ssh -i {ssh_key}\' {production}:{upload_dir}'.format(
         source_dir=source_dir,
         ssh_key=SETTINGS.SSH_KEY,
         production=production_server,
