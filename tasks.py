@@ -27,3 +27,17 @@ def restore(slug, archive, production_server, production_dir):
 
     deployer = Deployer(production_server, SETTINGS.SSH_KEY, archive_dir, production_dir)
     deployer.deploy(archive)
+
+@celery.task
+def rsync(slug, production_server, production_dir):
+    source_dir = os.path.join('/var/www/html/', slug, 'wp-content/uploads')
+    upload_dir = os.path.join(production_dir, 'wp-content/uploads')
+
+    command = 'cd {source_dir}; rsync -rt ./* -r \'ssh -i {ssh_key}\' {production}:{upload_dir}'.format(
+        source_dir=source_dir,
+        ssh_key=SETTINGS.SSH_KEY,
+        production=production_server,
+        upload_dir=upload_dir
+    )
+
+    result = subprocess.check_call(command, shell=True)

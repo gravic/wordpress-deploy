@@ -365,6 +365,8 @@ def sites_deploy(slug):
 
     active_tasks[slug] = result
 
+    tasks.rsync.delay(site.slug, site.production_server, site.production_dir)
+
     history = History(
         site,
         user,
