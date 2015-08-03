@@ -9,7 +9,7 @@ class Deployer(object):
         self.target_dir = target_dir
 
     def deploy(self, archive):
-        command = 'cat {archive_path} | ssh -i ~/.ssh/{ssh_key} {production} "cd {directory}; tar xvjfm -"'.format(
+        command = 'cat {archive_path} | ssh -i {ssh_key} {production} "cd {directory}; tar xvjfm -"'.format(
             archive_path=os.path.abspath(os.path.join(self.source_dir, archive)),
             ssh_key=self.ssh_key,
             production=self.production_url,
