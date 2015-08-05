@@ -147,6 +147,35 @@ class Compiler(object):
                     f.write(content)
                     self.completed_assets.append(url)
 
+    def crawl_xml(self, url):
+        try:
+            html = urlopen(url).read()
+        except HTTPError, err:
+            if err.code == 404:
+                return
+
+        soup = BeautifulSoup(html)
+
+        output_path = self.to_path(url)
+
+        directory = os.path.dirname(output_path)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        with open(output_path, 'w+') as f:
+            f.write(html)
+
+        links = soup.find_all('loc')
+
+        for link in links:
+            href = link.get_text()
+
+            if not self.is_xml(href):
+                continue
+
+            self.crawl_xml(href)
+
     def is_valid(self, ele):
         if not ele.has_attr('href'):
             return False
@@ -164,6 +193,9 @@ class Compiler(object):
                 return False
 
         return True
+
+    def is_xml(self, url):
+        return '.xml' in url
 
     def save(self, url, html):
         output_path = os.path.join(self.to_path(url), 'index.html')
@@ -205,8 +237,11 @@ class Compiler(object):
         self.crawl_php(os.path.join(self.theme_url, 'forms/'))
         asset_end = datetime.now()
 
+        self.crawl_xml(os.path.join(self.testing_url, 'sitemap.xml'))
+
         print 'Crawled {0} pages in {1}'.format(len(self.completed), end - start)
         print 'Crawled {0} assets in {1}'.format(len(self.completed_assets), asset_end - asset_start)
+
 
 if __name__ == '__main__':
     compiler = Compiler('./test/', 'http://gravictest2/remark/', 'http://remarksoftware.com', 'http://gravictest2/remark/wp-content/themes/remark/')
