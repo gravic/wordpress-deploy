@@ -1,7 +1,7 @@
 wordpress-deploy
 ================
 
-This project was designed as an internal tool to build out WordPress sites to flat files for use in production. While it is currently geared towards and configured for Wordpress installations, it should work for compiling any dynamically served content to static HTML.
+This project was designed as an internal tool to build out WordPress sites to flat files for use in production. While it is currently geared towards and configured for WordPress installations, it should work for compiling any dynamically served content to static HTML.
 
 # Setup
 
