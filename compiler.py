@@ -241,9 +241,3 @@ class Compiler(object):
 
         print 'Crawled {0} pages in {1}'.format(len(self.completed), end - start)
         print 'Crawled {0} assets in {1}'.format(len(self.completed_assets), asset_end - asset_start)
-
-
-if __name__ == '__main__':
-    compiler = Compiler('./test/', 'http://gravictest2/remark/', 'http://remarksoftware.com', 'http://gravictest2/remark/wp-content/themes/remark/')
-
-    compiler.compile()
