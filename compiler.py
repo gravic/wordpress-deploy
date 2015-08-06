@@ -68,36 +68,7 @@ class Compiler(object):
 
             urls = self.extract_urls(content)
 
-            for url in urls:
-                parent_parts = link['href'].split('/')
-                url_parts = url.split('/')
-
-                for part in url_parts:
-                    if part == '.':
-                        url_parts = url_parts[1:]
-                        parent_parts = parent_parts[:-1]
-                    elif part == '..':
-                        url_parts = url_parts[1:]
-                        parent_parts = parent_parts[:-2]
-
-                url = os.path.join('/'.join(parent_parts), '/'.join(url_parts))
-                url = url.replace('\\', '/')
-
-                if '?' in url:
-                    url = url[:url.index('?')]
-
-                content = urlopen(url).read()
-
-                output_path = self.to_path(url)
-
-                directory = os.path.dirname(output_path)
-
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-
-                with open(output_path, 'w+') as f:
-                    f.write(content)
-                    self.completed_assets.append(url)
+            self.save_linked_contents(link['href'], urls)
 
             output_path = self.to_path(link['href'])
 
@@ -120,6 +91,38 @@ class Compiler(object):
         urls = re.findall('url\(([^)]+)\)', css)
 
         return [unquote(url) for url in urls if 'data:' not in url]
+
+    def save_linked_contents(self, parent, urls):
+        for url in urls:
+            parent_parts = parent.split('/')
+            url_parts = url.split('/')
+
+            for part in url_parts:
+                if part == '.':
+                    url_parts = url_parts[1:]
+                    parent_parts = parent_parts[:-1]
+                elif part == '..':
+                    url_parts = url_parts[1:]
+                    parent_parts = parent_parts[:-2]
+
+            url = os.path.join('/'.join(parent_parts), '/'.join(url_parts))
+            url = url.replace('\\', '/')
+
+            if '?' in url:
+                url = url[:url.index('?')]
+
+            content = urlopen(url).read()
+
+            output_path = self.to_path(url)
+
+            directory = os.path.dirname(output_path)
+
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            with open(output_path, 'w+') as f:
+                f.write(content)
+                self.completed_assets.append(url)
 
     def crawl_js(self, url):
         try:
