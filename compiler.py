@@ -111,6 +111,9 @@ class Compiler(object):
             if '?' in url:
                 url = url[:url.index('?')]
 
+            if '#' in url:
+                url = url[:url.index('#')]
+
             content = urlopen(url).read()
 
             output_path = self.to_path(url)
