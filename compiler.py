@@ -45,6 +45,22 @@ class Compiler(object):
 
             self.crawl(link['href'])
 
+    def crawl_errors(self, errors):
+        if not isinstance(errors, list):
+            errors = [errors]
+
+        for error in errors:
+            url = os.path.join(self.testing_url, str(error))
+
+            try:
+                urlopen(url)
+            except HTTPError, err:
+                if err.code == error:
+                    html = err.fp.read()
+                    self.save(url, html)
+                else:
+                    self.skipped.append(url)
+
     def crawl_css(self, url):
         try:
             html = urlopen(url).read()
@@ -280,6 +296,7 @@ class Compiler(object):
 
         start = datetime.now()
         self.crawl(self.testing_url)
+        self.crawl_errors(404)
         end = datetime.now()
 
         asset_start = datetime.now()
