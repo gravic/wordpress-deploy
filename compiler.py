@@ -124,12 +124,6 @@ class Compiler(object):
             url = os.path.join('/'.join(parent_parts), '/'.join(url_parts))
             url = url.replace('\\', '/')
 
-            if '?' in url:
-                url = url[:url.index('?')]
-
-            if '#' in url:
-                url = url[:url.index('#')]
-
             content = urlopen(url).read()
 
             output_path = self.to_path(url)
@@ -283,6 +277,12 @@ class Compiler(object):
             self.completed.append(url)
 
     def to_path(self, url):
+        if '?' in url:
+            url = url[:url.index('?')]
+
+        if '#' in url:
+            url = url[:url.index('#')]
+
         path = os.path.abspath(os.path.join(self.output_dir, url.replace(self.testing_url, '')))
 
         return path
