@@ -230,6 +230,8 @@ class Compiler(object):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
+        html = self.replace_links(html)
+
         with open(output_path, 'w+') as f:
             f.write(html)
 
