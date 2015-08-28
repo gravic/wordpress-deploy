@@ -21,7 +21,9 @@ class Compiler(object):
 
     def crawl(self, url):
         try:
-            html = urlopen(url).read()
+            response = urlopen(url)
+            content_type = response.info().type
+            html = response.read()
         except HTTPError, err:
             if err.code == 404:
                 self.skipped.append(url)
@@ -29,7 +31,7 @@ class Compiler(object):
 
         soup = BeautifulSoup(html)
 
-        self.save(url, html)
+        self.save(url, content_type, html)
 
         links = soup.find_all('a')
 
@@ -260,7 +262,7 @@ class Compiler(object):
     def is_xml(self, url):
         return '.xml' in url
 
-    def save(self, url, html):
+    def save(self, url, content_type, html):
         output_path = os.path.join(self.to_path(url), 'index.html')
 
         directory = os.path.dirname(output_path)
@@ -268,7 +270,10 @@ class Compiler(object):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        minified_html = minify(unicode(html, 'utf-8', 'replace'), remove_comments=True, remove_empty_space=True, reduce_boolean_attributes=True, remove_optional_attribute_quotes=False)
+        if content_type == 'text/html':
+            minified_html = minify(unicode(html, 'utf-8', 'replace'), remove_comments=True, remove_empty_space=True, reduce_boolean_attributes=True, remove_optional_attribute_quotes=False)
+        else:
+            minified_html = unicode(html, 'utf-8', 'replace')
 
         minified_html = self.replace_links(minified_html)
 
