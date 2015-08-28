@@ -59,7 +59,8 @@ class Compiler(object):
             except HTTPError, err:
                 if err.code == error:
                     html = err.fp.read()
-                    self.save(url, html)
+                    content_type = err.fp.info().type
+                    self.save(url, content_type, html)
                 else:
                     self.skipped.append(url)
 
