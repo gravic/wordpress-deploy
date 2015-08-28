@@ -64,6 +64,25 @@ class Compiler(object):
                 else:
                     self.skipped.append(url)
 
+    def crawl_hidden(self, hidden_identifier):
+        sitemap_url = os.path.join(self.testing_url, 'sitemap')
+
+        try:
+            html = urlopen(sitemap_url).read()
+        except HTTPError, err:
+            return
+
+        soup = BeautifulSoup(html)
+
+        comment = soup.find(text=re.compile(hidden_identifier)).replace(hidden_identifier, '')
+
+        hidden_urls = comment.split(',')[:-1]
+
+        for url in hidden_urls:
+            url = url.strip()
+
+            self.crawl(url)
+
     def crawl_css(self, url):
         try:
             html = urlopen(url).read()
@@ -304,6 +323,7 @@ class Compiler(object):
 
         start = datetime.now()
         self.crawl(self.testing_url)
+        self.crawl_hidden('HIDDEN LINKS: ')
         self.crawl_errors(404)
         end = datetime.now()
 
